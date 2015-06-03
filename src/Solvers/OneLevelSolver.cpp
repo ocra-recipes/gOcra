@@ -5,23 +5,23 @@
  * \brief Implement concrete solvers class for \b one-level LQP solver.
  */
 
-#include "orcisir/Solvers/OneLevelSolver.h"
+#include "gocra/Solvers/OneLevelSolver.h"
 
 #include <Eigen/SVD>
 
-#include "orc/control/ControlEnum.h"
+#include "ocra/control/ControlEnum.h"
 
-#include "orc/optim/MergedVariable.h"
+#include "ocra/optim/MergedVariable.h"
 
-using namespace orcisir;
+using namespace gocra;
 
 /** Constructor of the abstract one level solver.
  *
  * \param m The Model of the robot
  */
 OneLevelSolver::OneLevelSolver()
-    : ISIRSolver()
-    , orc::NamedInstance("One Level Solver")
+    : gOcraSolver()
+    , ocra::NamedInstance("One Level Solver")
 {
 
 }
@@ -41,9 +41,9 @@ OneLevelSolver::~OneLevelSolver()
  *
  * Actually, as this solver considers that all tasks have the same level, this function does nothing.
  */
-void OneLevelSolver::setObjectiveLevel(orc::QuadraticObjective& obj, int level)
+void OneLevelSolver::setObjectiveLevel(ocra::QuadraticObjective& obj, int level)
 {
-    //std::cout<<"[orcisir::OneLevelSolver::setObjectiveLevel] Warning: solver doesn't take into account level for task.\n";
+    //std::cout<<"[gocra::OneLevelSolver::setObjectiveLevel] Warning: solver doesn't take into account level for task.\n";
 }
 
 
@@ -87,7 +87,7 @@ std::string OneLevelSolver::toString() const
  * \param m The Model of the robot
  */
 OneLevelSolverWithQuadProg::OneLevelSolverWithQuadProg()
-    : orc::NamedInstance("One Level Solver with QuadProg++ subSolver")
+    : ocra::NamedInstance("One Level Solver with QuadProg++ subSolver")
     , OneLevelSolver()
 {
 
@@ -113,12 +113,12 @@ void OneLevelSolverWithQuadProg::updateObjectiveEquations()
     for(int i=0; i<_objectives.size(); i++)
     {
 
-        orc::QuadraticFunction& obj     = _objectives[i]->getFunction();
+        ocra::QuadraticFunction& obj     = _objectives[i]->getFunction();
         double weight                   = _objectives[i]->getWeight();
         const std::vector<int>& objMap  = findMapping(obj.getVariable());
 
-        orc::utils::addCompressed2d(   obj.getPi(), _C, objMap, weight);
-        orc::utils::addCompressedByRow(obj.getqi(), _d, objMap, weight);
+        ocra::utils::addCompressed2d(   obj.getPi(), _C, objMap, weight);
+        ocra::utils::addCompressedByRow(obj.getqi(), _d, objMap, weight);
 
     }
 
@@ -142,7 +142,7 @@ void OneLevelSolverWithQuadProg::updateConstraintEquations()
     int idx = 0;
     for (int i=0; i<_equalityConstraints.size(); ++i)
     {
-        orc::LinearConstraint* cstr = _equalityConstraints[i];
+        ocra::LinearConstraint* cstr = _equalityConstraints[i];
         int dim = cstr->getDimension();
 
         if (dim > 0)
@@ -151,7 +151,7 @@ void OneLevelSolverWithQuadProg::updateConstraintEquations()
             Eigen::VectorBlock<Eigen::VectorXd> _b_segment = _b.segment(idx, dim);
 
             Eigen::VectorXd v; // ?? is it useless ??
-            orc::utils::convert(*cstr, findMapping(cstr->getVariable()), orc::CSTR_PLUS_EQUAL, _A_block, _b_segment, v);
+            ocra::utils::convert(*cstr, findMapping(cstr->getVariable()), ocra::CSTR_PLUS_EQUAL, _A_block, _b_segment, v);
 
             idx += dim;
         }
@@ -175,7 +175,7 @@ void OneLevelSolverWithQuadProg::updateConstraintEquations()
     idx = 0;
     for (int i=0; i<_inequalityConstraints.size(); ++i)
     {
-        orc::LinearConstraint* cstr = _inequalityConstraints[i];
+        ocra::LinearConstraint* cstr = _inequalityConstraints[i];
         int dim = cstr->getDimension();
 
         if (dim > 0)
@@ -183,7 +183,7 @@ void OneLevelSolverWithQuadProg::updateConstraintEquations()
             Eigen::Block<Eigen::MatrixXd > _G_block = _G.block(idx, 0, dim, n());
             Eigen::VectorBlock<Eigen::VectorXd> _h_segment = _h.segment(idx, dim);
             Eigen::VectorXd v;  // ?? is it useless ??
-            orc::utils::convert(*cstr, findMapping(cstr->getVariable()), orc::CSTR_PLUS_GREATER, _G_block, _h_segment, v);
+            ocra::utils::convert(*cstr, findMapping(cstr->getVariable()), ocra::CSTR_PLUS_GREATER, _G_block, _h_segment, v);
 
             idx += dim;
         }
@@ -201,7 +201,7 @@ void OneLevelSolverWithQuadProg::doSolve()
 
     QuadProgPP::solve_quadprog(_C, -_d, _Atotal, _btotal, _G, _h, Xsolution);
     _result.solution = Xsolution;
-    _result.info = orc::RETURN_SUCCESS; //TODO: should be dfined through the result of the QuadProgPP::solve_quadprog
+    _result.info = ocra::RETURN_SUCCESS; //TODO: should be dfined through the result of the QuadProgPP::solve_quadprog
 
     solveRecorder.saveRelativeTime();
 }
@@ -221,9 +221,9 @@ void OneLevelSolverWithQuadProg::doSolve()
  * \param m The Model of the robot
  */
 OneLevelSolverWithQLD::OneLevelSolverWithQLD()
-    : orc::NamedInstance("One Level Solver with QLD subSolver")
+    : ocra::NamedInstance("One Level Solver with QLD subSolver")
     , OneLevelSolver()
-    , _QLDsolver( new orc::ObjQLD() )
+    , _QLDsolver( new ocra::ObjQLD() )
     , MapP(NULL, 0,0)
     , Mapq(NULL,0)
     , MapAandG(NULL,0,0)
@@ -263,12 +263,12 @@ void OneLevelSolverWithQLD::updateObjectiveEquations()
     for(int i=0; i<_objectives.size(); i++)
     {
 
-        orc::QuadraticFunction& obj     = _objectives[i]->getFunction();
+        ocra::QuadraticFunction& obj     = _objectives[i]->getFunction();
         double weight                   = _objectives[i]->getWeight();
         const std::vector<int>& objMap  = findMapping(obj.getVariable());
 
-        orc::utils::addCompressed2d(   obj.getPi(), _C, objMap, weight);
-        orc::utils::addCompressedByRow(obj.getqi(), _d, objMap, weight);
+        ocra::utils::addCompressed2d(   obj.getPi(), _C, objMap, weight);
+        ocra::utils::addCompressedByRow(obj.getqi(), _d, objMap, weight);
 
     }
 
@@ -292,7 +292,7 @@ void OneLevelSolverWithQLD::updateConstraintEquations()
     int idx = 0;
     for (int i=0; i<_equalityConstraints.size(); ++i)
     {
-        orc::LinearConstraint* cstr = _equalityConstraints[i];
+        ocra::LinearConstraint* cstr = _equalityConstraints[i];
         int dim = cstr->getDimension();
 
         if (dim > 0)
@@ -301,7 +301,7 @@ void OneLevelSolverWithQLD::updateConstraintEquations()
             Eigen::VectorBlock<Eigen::VectorXd> _b_segment = _b.segment(idx, dim);
 
             Eigen::VectorXd v; // ?? is it useless ??
-            orc::utils::convert(*cstr, findMapping(cstr->getVariable()), orc::CSTR_PLUS_EQUAL, _A_block, _b_segment, v);
+            ocra::utils::convert(*cstr, findMapping(cstr->getVariable()), ocra::CSTR_PLUS_EQUAL, _A_block, _b_segment, v);
 
             idx += dim;
         }
@@ -325,7 +325,7 @@ void OneLevelSolverWithQLD::updateConstraintEquations()
     idx = 0;
     for (int i=0; i<_inequalityConstraints.size(); ++i)
     {
-        orc::LinearConstraint* cstr = _inequalityConstraints[i];
+        ocra::LinearConstraint* cstr = _inequalityConstraints[i];
         int dim = cstr->getDimension();
 
         if (dim > 0)
@@ -333,7 +333,7 @@ void OneLevelSolverWithQLD::updateConstraintEquations()
             Eigen::Block<Eigen::MatrixXd > _G_block = _G.block(idx, 0, dim, n());
             Eigen::VectorBlock<Eigen::VectorXd> _h_segment = _h.segment(idx, dim);
             Eigen::VectorXd v;  // ?? is it useless ??
-            orc::utils::convert(*cstr, findMapping(cstr->getVariable()), orc::CSTR_PLUS_GREATER, _G_block, _h_segment, v);
+            ocra::utils::convert(*cstr, findMapping(cstr->getVariable()), ocra::CSTR_PLUS_GREATER, _G_block, _h_segment, v);
 
             idx += dim;
         }
@@ -380,7 +380,7 @@ void OneLevelSolverWithQLD::doSolve()
 
     _result.solution = MapXsol;
 
-    _result.info = orc::RETURN_SUCCESS; //TODO: should be dfined through the result of the QuadProgPP::solve_quadprog
+    _result.info = ocra::RETURN_SUCCESS; //TODO: should be dfined through the result of the QuadProgPP::solve_quadprog
 
     solveRecorder.saveRelativeTime();
 }

@@ -2,7 +2,7 @@
 GHController
 ======================
 
-This library is a c++ package to control robotic systems in dynamics
+This library is a c++ package to control robotic systems in dynamics and in quasi-static
 
 dependencies
 ------------
@@ -11,7 +11,7 @@ It depends on:
 
 * Eigen3 (with unsupported element: Lgsm)
 * quadprog
-* orc_framework
+* core_framework
 
 
 installation

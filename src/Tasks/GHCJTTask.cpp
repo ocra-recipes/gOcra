@@ -2,24 +2,24 @@
  * \file GHCJTTask.cpp
  * \author Mingxing Liu
  *
- * \brief Implement \b task class for GHCJT controller. It inherits from the task class defined in the xde framework.
+ * \brief Implement \b task class for GHCJT controller. It inherits from the task class defined in the ocra framework.
  */
 
-#include "orcisir/Tasks/GHCJTTask.h"
+#include "gocra/Tasks/GHCJTTask.h"
 
-// ORC INCLUDES
-#include "orc/control/Model.h"
-#include "orc/optim/FunctionHelpers.h"
-#include "orc/optim/LinearFunction.h"
-#include "orc/optim/LinearizedCoulombFunction.h"
-#include "orc/optim/WeightedSquareDistanceFunction.h"
-#include "orc/optim/SumOfLinearFunctions.h"
+// OCRA INCLUDES
+#include "ocra/control/Model.h"
+#include "ocra/optim/FunctionHelpers.h"
+#include "ocra/optim/LinearFunction.h"
+#include "ocra/optim/LinearizedCoulombFunction.h"
+#include "ocra/optim/WeightedSquareDistanceFunction.h"
+#include "ocra/optim/SumOfLinearFunctions.h"
 
-// ORCISIR INCLUDES
-#include "orcisir/ISIRDebug.h"
+// GOCRA INCLUDES
+#include "gocra/gOcraDebug.h"
 
 
-namespace orcisir
+namespace gocra
 {
 
 
@@ -32,7 +32,7 @@ struct GHCJTTask::Pimpl
     SumOfLinearFunctions*  seConstraint;
     boost::shared_ptr<LinearFunction> taskSEConstraintFunction;
     bool                        useGSHC;
-    orc::BaseVariable           fcVar;
+    ocra::BaseVariable           fcVar;
 
 
     double                weight;
@@ -50,7 +50,7 @@ struct GHCJTTask::Pimpl
     bool contactForceConstraintHasBeenSavedInSolver;
     bool contactPointHasBeenSavedInModel;
     bool frictionConstraintIsRegisteredInConstraint;
-//    EqualZeroConstraintPtr<LinearFunction>  ContactForceConstraint;
+
 
     bool isRegisteredAsObjective;
     bool isRegisteredAsConstraint;
@@ -61,7 +61,7 @@ struct GHCJTTask::Pimpl
     Objective<SquaredLinearFunction>*       innerTaskAsObjective;
     EqualZeroConstraintPtr<LinearFunction>  innerTaskAsConstraint;
 
-    LinearFunction*                         regulationObjectiveFunction; //objective function for GSHC
+    LinearFunction*                         regulationObjectiveFunction; //objective function for GHC
     Objective<SquaredLinearFunction>*       regulationObjective;
 
     Pimpl(const std::string& name, const Model& m, const Feature& s)
@@ -138,10 +138,10 @@ struct GHCJTTask::Pimpl
 };
 
 
-/** Initialize a new ISIR Task.
+/** Initialize a new GHCJT Task.
  *
  * \param name The name of the task
- * \param model The xde model on which we will update the dynamic parameters
+ * \param model The ocr::Model on which we will update the dynamic parameters
  * \param feature The task feature, meaning what we want to control
  * \param featureDes The desired task feature, meaning the goal we want to reach with the \a feature
  */
@@ -152,10 +152,10 @@ GHCJTTask::GHCJTTask(const std::string& taskName, const Model& innerModel, const
 
 }
 
-/** Initialize a new ISIR Task.
+/** Initialize a new GHCJT Task.
  *
  * \param name The name of the task
- * \param model The xde model on which we will update the dynamic parameters
+ * \param model The ocra::Model on which we will update the dynamic parameters
  * \param feature The task feature, meaning what we want to control
  */
 GHCJTTask::GHCJTTask(const std::string& taskName, const Model& innerModel, const Feature& feature)
@@ -172,11 +172,11 @@ GHCJTTask::~GHCJTTask()
 }
 
 
-void GHCJTTask::connectToController(ISIRSolver& solver, SumOfLinearFunctions& seConstraint, bool useGSHC)
+void GHCJTTask::connectToController(gOcraSolver& solver, SumOfLinearFunctions& seConstraint)
 {
     pimpl->solver            = &solver;
     pimpl->seConstraint = &seConstraint;
-    pimpl->useGSHC           =  useGSHC;
+
 
     int featn = pimpl->feature.getDimension();
     pimpl->innerObjectiveFunction = new LinearFunction(pimpl->fcVar, Eigen::MatrixXd::Identity(featn, featn), Eigen::VectorXd::Zero(featn));
@@ -206,10 +206,7 @@ void GHCJTTask::disconnectFromController()
     {
         pimpl->solver->removeConstraint(pimpl->frictionConstraint.getConstraint());
     }
-//    if (pimpl->contactForceConstraintHasBeenSavedInSolver)
-//    {
-//        pimpl->solver->removeConstraint(pimpl->ContactForceConstraint);
-//    }
+
 
 }
 
@@ -236,11 +233,7 @@ void GHCJTTask::addContactPointInModel()
         pimpl->contactPointHasBeenSavedInModel = true;
     }
 
-//    if ( pimpl->contactForceConstraintHasBeenSavedInSolver )
-//    {
-//        pimpl->solver->removeConstraint(pimpl->ContactForceConstraint);
-//        pimpl->contactForceConstraintHasBeenSavedInSolver = false;
-//    }
+
 }
 
 void GHCJTTask::removeContactPointInModel()
@@ -272,7 +265,7 @@ void GHCJTTask::doActivateContactMode()
 
     // add friction cone in constraint
     pimpl->solver->addConstraint(pimpl->frictionConstraint.getConstraint());
-//    pimpl->solver->addConstraint(pimpl->frictionConstraint);
+
     pimpl->frictionConstraintIsRegisteredInConstraint = true;
 }
 
@@ -327,7 +320,7 @@ void GHCJTTask::doActivateAsObjective()
 
     pimpl->isRegisteredAsObjective = true;
 
-//    addContactPointInModel();
+
 
 }
 
@@ -344,7 +337,7 @@ void GHCJTTask::doDeactivateAsObjective()
         pimpl->seConstraint->removeFunction(*pimpl->taskSEConstraintFunction);
     pimpl->isRegisteredAsObjective = false;
 
-//    removeContactPointInModel();
+
 
 }
 
@@ -362,7 +355,7 @@ void GHCJTTask::doActivateAsConstraint()
         pimpl->seConstraint->addFunction(*pimpl->taskSEConstraintFunction);
 
     pimpl->isRegisteredAsConstraint = true;
-//    addContactPointInModel();
+
 
 }
 
@@ -378,7 +371,7 @@ void GHCJTTask::doDeactivateAsConstraint()
     if (pimpl->isFreeFloating)
         pimpl->seConstraint->removeFunction(*pimpl->taskSEConstraintFunction);
     pimpl->isRegisteredAsConstraint = false;
-//    removeContactPointInModel();
+
 
 }
 
@@ -393,10 +386,10 @@ void GHCJTTask::doDeactivateAsConstraint()
  */
 void GHCJTTask::doSetWeight()
 {
-//    pimpl->weight = getWeight()[0]; //TODO: BUG HERE!!!
+
     if (pimpl->innerTaskAsObjective)
     {
-//        pimpl->innerTaskAsObjective->setWeight(pimpl->weight);
+
         pimpl->innerTaskAsObjective->getFunction().changeWeight(getWeight());
     }
 
@@ -453,7 +446,7 @@ void GHCJTTask::checkIfConnectedToController() const
 {
     if (!pimpl->solver)
     {
-        std::string errmsg = std::string("[GHCJTTask::doActivateAsObjective]: task '") + getName() + std::string("' not connected to any solver; Call prior that 'ISIRController::addTask' to connect to the solver inside the controller.\n"); //
+        std::string errmsg = std::string("[GHCJTTask::doActivateAsObjective]: task '") + getName() + std::string("' not connected to any solver; Call prior that 'GHCJTController::addTask' to connect to the solver inside the controller.\n"); //
         throw std::runtime_error(std::string(errmsg));
     }
 }
@@ -461,14 +454,12 @@ void GHCJTTask::checkIfConnectedToController() const
 
 const MatrixXd& GHCJTTask::getPriority() const
 {
-//  std::cout<<pimpl->alpha<<"\n"<<"\n";
   return pimpl->alpha;
 
 }
 
 void GHCJTTask::setPriority(Eigen::MatrixXd& alpha)
 {
-//    std::cout<<alpha<<"\n";
     pimpl->alpha = alpha;
 
 }
@@ -533,4 +524,4 @@ const Variable& GHCJTTask::getVariable() const
   return pimpl->fcVar;
 }
 
-} // end namespace orcisir
+} // end namespace gocra

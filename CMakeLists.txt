@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(orcisir_NewController CXX)
+project(wLQP-Control CXX)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -46,9 +46,13 @@ endfunction()
 # Check dependencies
 find_package(PkgConfig REQUIRED)
 find_package(Boost REQUIRED)
-get_package_with_same_build_type(PC_EIGEN_LGSM eigen_lgsm)
+PKG_CHECK_MODULES(PC_EIGEN eigen3<=3.0.5 REQUIRED)
+if(NOT PC_EIGEN_FOUND)
+    message("Failed to detect Eigen, check PKG_CONFIG_PATH." )
+endif(NOT PC_EIGEN_FOUND)
+
 get_package_with_same_build_type(PC_QUADPROG quadprog)
-get_package_with_same_build_type(PC_ORC_FRAMEWORK orc_framework)
+get_package_with_same_build_type(PC_OCRA_FRAMEWORK ocra_framework)
 
 
 add_subdirectory(pkg-config)

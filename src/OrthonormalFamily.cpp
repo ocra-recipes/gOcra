@@ -2,17 +2,17 @@
  * \file OrthonormalFamily.cpp
  * \author Mingxing Liu
  *
- * \brief Orthonormal Family computation for Generalized Smooth Hierarchical Control (GSHC).
+ * \brief Orthonormal Family computation for Generalized Hierarchical Control (GHC).
  *
  */
 
-#include "orcisir/OrthonormalFamily.h"
+#include "gocra/OrthonormalFamily.h"
 
 using namespace Eigen;
 
 #include <iostream>
 
-namespace orcisir
+namespace gocra
 {
 OrthonormalFamily::OrthonormalFamily(const MatrixXd& fam, const double eps)
 {
@@ -86,4 +86,4 @@ void OrthonormalFamily::setEpsilon(const double eps)
 {
     epsilon = eps;
 }
-} // namespace orcisir
+} // namespace gocra
