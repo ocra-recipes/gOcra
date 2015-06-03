@@ -5,15 +5,15 @@
 #include <Eigen/Eigen>
 
 #include "Model3T.h"
-#include "orcisir/OrthonormalFamily.h"
+#include "gocra/OrthonormalFamily.h"
 
-#include "orcisir/GHCJTController.h"
-#include "orcisir/Solvers/OneLevelSolver.h"
-#include "orc/control/Feature.h"
-#include "orc/control/FullState.h"
-#include "orc/control/ControlFrame.h"
-#include "orc/control/ControlEnum.h"
-#include "orcisir/Constraints/ISIRConstraint.h"
+#include "gocra/GHCJTController.h"
+#include "gocra/Solvers/OneLevelSolver.h"
+#include "ocra/control/Feature.h"
+#include "ocra/control/FullState.h"
+#include "ocra/control/ControlFrame.h"
+#include "ocra/control/ControlEnum.h"
+
 
 
 
@@ -24,23 +24,23 @@ int main(int argc, char** argv)
     bool useGSHC = true;
     bool useGrav = true;
 
-    orcisir::OneLevelSolverWithQuadProg   internalSolver;
+    gocra::OneLevelSolverWithQuadProg   internalSolver;
     
     // INITIALIZE ISIR MODEL, CONTROLLER & TASK MANAGER
     std::cout<<"INITIALIZE ISIR MODEL, CONTROLLER\n";
     Model3T                         model("Model3T");
-    orcisir::GHCJTController         ctrl("myCtrl", model, internalSolver, useGSHC, useGrav);
+    gocra::GHCJTController         ctrl("myCtrl", model, internalSolver, useGrav);
 
 
     //CREATE SOME TASKS
     std::cout<<"CREATE SOME TASKS\n";
-    orc::FullModelState   FMS("fullTask.FModelState" , model, orc::FullState::INTERNAL); //INTERNAL, FREE_FLYER
-    orc::FullTargetState  FTS("fullTask.FTargetState", model, orc::FullState::INTERNAL);
-    orc::FullStateFeature feat("fullTask.feat", FMS);
-    orc::FullStateFeature featDes("fullTask.featDes", FTS);
+    ocra::FullModelState   FMS("fullTask.FModelState" , model, ocra::FullState::INTERNAL); //INTERNAL, FREE_FLYER
+    ocra::FullTargetState  FTS("fullTask.FTargetState", model, ocra::FullState::INTERNAL);
+    ocra::FullStateFeature feat("fullTask.feat", FMS);
+    ocra::FullStateFeature featDes("fullTask.featDes", FTS);
     FTS.set_q(Eigen::VectorXd::Zero(model.nbInternalDofs()));
 
-    orcisir::GHCJTTask& accTask = ctrl.createGHCJTTask("fullTask", feat, featDes);
+    gocra::GHCJTTask& accTask = ctrl.createGHCJTTask("fullTask", feat, featDes);
 
     ctrl.addTask(accTask);
     accTask.activateAsObjective();
@@ -48,17 +48,17 @@ int main(int argc, char** argv)
     accTask.setDamping(6);
     accTask.setWeight(1.);
 
-    orc::SegmentFrame        SF("frameTask.SFrame", model, "Model3T.segment_3", Eigen::Displacementd());
-    orc::TargetFrame         TF("frameTask.TFrame", model);
-    orc::PositionFeature feat2("frameTask.feat", SF, orc::XYZ);
-    orc::PositionFeature featDes2("frameTask.featDes", TF, orc::XYZ);
+    ocra::SegmentFrame        SF("frameTask.SFrame", model, "Model3T.segment_3", Eigen::Displacementd());
+    ocra::TargetFrame         TF("frameTask.TFrame", model);
+    ocra::PositionFeature feat2("frameTask.feat", SF, ocra::XYZ);
+    ocra::PositionFeature featDes2("frameTask.featDes", TF, ocra::XYZ);
 
     TF.setPosition(Eigen::Displacementd(0.2,0.3,0.4));
     TF.setVelocity(Eigen::Twistd());
     TF.setAcceleration(Eigen::Twistd());
 
 
-    orcisir::GHCJTTask& accTask2 = ctrl.createGHCJTTask("frameTask", feat2, featDes2);
+    gocra::GHCJTTask& accTask2 = ctrl.createGHCJTTask("frameTask", feat2, featDes2);
 
     ctrl.addTask(accTask2);
     accTask2.activateAsObjective();
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
     int nt = ctrl.getNbActiveTask();
 
     MatrixXd param_priority(nt,nt);
-//        std::vector< orcisir::GHCJTTask* >& activeTask = ctrl.getActiveTask();
+//        std::vector< gocra::GHCJTTask* >& activeTask = ctrl.getActiveTask();
 
     param_priority<<0,1,0,0;
     ctrl.setTaskProjectors(param_priority);

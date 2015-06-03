@@ -20,20 +20,20 @@ file(
 )
 
 add_library(
-	wLQP-Control${suffix_type}
+	gocra${suffix_type}
 	${LIB_TYPE}
 	${source_files}
 )
 
 
 target_link_libraries(
-    wLQP-Control
+    gocra
     ${PC_QUADPROG_LIBRARIES}
     ${PC_OCRA_FRAMEWORK_LIBRARIES}
 )
 
 install(
-    TARGETS wLQP-Control
+    TARGETS gocra
     ${install_type} DESTINATION lib
 )
 

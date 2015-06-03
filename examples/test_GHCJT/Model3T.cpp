@@ -21,7 +21,7 @@ EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Rotation3d)
 
 extern "C"
 {
-    orc::Model* Create(const std::string& robotName)
+    ocra::Model* Create(const std::string& robotName)
     {
         return new Model3T(robotName);
     }
@@ -154,7 +154,7 @@ public:
 
 
 Model3T::Model3T(const std::string& robotName)
-    : orc::Model(robotName, 3, false)
+    : ocra::Model(robotName, 3, false)
     , pimpl( new Pimpl(robotName))
 {
     update();

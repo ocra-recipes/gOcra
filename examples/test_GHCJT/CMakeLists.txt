@@ -14,19 +14,19 @@ if(NOT PC_EIGEN_FOUND)
     message("Failed to detect Eigen, check PKG_CONFIG_PATH." )
 endif(NOT PC_EIGEN_FOUND)
 
-PKG_CHECK_MODULES(PC_ORCISIR_ISIRCONTROLLER orcisir_NewController REQUIRED)
-if(NOT PC_ORCISIR_ISIRCONTROLLER_FOUND)
-    message("Failed to detect orcisir_NewController, check PKG_CONFIG_PATH." )
-endif(NOT PC_ORCISIR_ISIRCONTROLLER_FOUND)
+PKG_CHECK_MODULES(PC_GOCRA GHCJTController REQUIRED)
+if(NOT PC_GOCRA_FOUND)
+    message("Failed to detect GHCJTController, check PKG_CONFIG_PATH." )
+endif(NOT PC_GOCRA_FOUND)
 
 
 
 include_directories(
-    ${PC_ORCISIR_ISIRCONTROLLER_INCLUDE_DIRS}
+    ${PC_GOCRA_INCLUDE_DIRS}
     ${PC_EIGEN_INCLUDE_DIRS}
 )
 LINK_DIRECTORIES(
-    ${PC_ORCISIR_ISIRCONTROLLER_LIBRARY_DIRS}
+    ${PC_GOCRA_LIBRARY_DIRS}
 )
 
 #========================================
@@ -38,18 +38,18 @@ add_library(
 
 target_link_libraries(
     Model3T
-    ${PC_ORCISIR_ISIRCONTROLLER_LIBRARIES}
+    ${PC_GOCRA_LIBRARIES}
 )
 
 #========================================
 add_executable(
     test_3T
-    main_gshc.cpp
+    main.cpp
 )
 
 target_link_libraries(
     test_3T
-    ${PC_ORCISIR_ISIRCONTROLLER_LIBRARIES}
+    ${PC_GOCRA_LIBRARIES}
     Model3T
 )
 

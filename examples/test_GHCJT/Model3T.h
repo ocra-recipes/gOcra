@@ -2,9 +2,9 @@
 #define __MODEL3T_H__
 
 
-#include "orc/control/Model.h"
+#include "ocra/control/Model.h"
 
-class Model3T: public orc::Model
+class Model3T: public ocra::Model
 {
 public:
     Model3T(const std::string& robotName);
