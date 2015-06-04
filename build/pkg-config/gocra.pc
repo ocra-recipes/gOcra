@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=/usr/local
+libdir=/usr/local/lib
+includedir=/usr/local/include
+
+Name: gocra
+Description: 
+URL: 
+Version: 
+Requires: ocra_framework, quadprog, eigen_lgsm
+Libs: -L/usr/local/lib -lgocra
+Cflags: -I/usr/local/include

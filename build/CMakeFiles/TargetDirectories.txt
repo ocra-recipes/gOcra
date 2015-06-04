@@ -1,0 +1,1 @@
+/home/codyco/icub/software/src/gOcra/build/src/CMakeFiles/gocra.dir

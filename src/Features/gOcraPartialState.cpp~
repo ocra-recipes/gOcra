@@ -6,7 +6,7 @@
  */
 
 
-#include "gocra/Features/gOcraPartialState.h"
+#include "gocra/Features/ISIRPartialState.h"
 
 #include "ocra/control/FullState.h"
 

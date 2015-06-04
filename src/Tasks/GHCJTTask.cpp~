@@ -28,7 +28,7 @@ struct GHCJTTask::Pimpl
     const std::string&          name;
     const Model&                innerModel;
     bool                        isFreeFloating;
-    gOcraSolver*                 solver;
+    ISIRSolver*                 solver;
     SumOfLinearFunctions*  seConstraint;
     boost::shared_ptr<LinearFunction> taskSEConstraintFunction;
     bool                        useGSHC;

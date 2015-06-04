@@ -142,7 +142,6 @@ void GHCJTController::removeConstraint(ocra::LinearConstraint& constraint) const
     pimpl->innerSolver.removeConstraint(constraint);
 }
 
-/*
 void GHCJTController::addConstraint(gOcraConstraint& constraint) const
 {
     pimpl->innerSolver.addConstraint(constraint.getConstraint());
@@ -153,7 +152,7 @@ void GHCJTController::removeConstraint(gOcraConstraint& constraint) const
 {
     pimpl->innerSolver.removeConstraint(constraint.getConstraint());
 }
-*/
+
 
 
 /** Internal implementation inside the addTask method.

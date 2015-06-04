@@ -20,7 +20,7 @@
 #include "ocra/control/ControlFrame.h"
 
 #include "gocra/Solvers/gOcraSolver.h"
-//#include "gocra/Constraints/gOcraConstraint.h"
+##include "gocra/Constraints/gOcraConstraint.h"
 
 
 using namespace ocra;

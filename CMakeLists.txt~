@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-SET(PROJECTNAME gocra)
+SET(PROJECTNAME gOcra)
 PROJECT(${PROJECTNAME})
 
 if(NOT CMAKE_BUILD_TYPE)
