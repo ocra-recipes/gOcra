@@ -14,9 +14,9 @@ if(NOT PC_EIGEN_FOUND)
     message("Failed to detect Eigen, check PKG_CONFIG_PATH." )
 endif(NOT PC_EIGEN_FOUND)
 
-PKG_CHECK_MODULES(PC_GOCRA GHCJTController REQUIRED)
+PKG_CHECK_MODULES(PC_GOCRA gOcra REQUIRED)
 if(NOT PC_GOCRA_FOUND)
-    message("Failed to detect GHCJTController, check PKG_CONFIG_PATH." )
+    message("Failed to detect gOcra, check PKG_CONFIG_PATH." )
 endif(NOT PC_GOCRA_FOUND)
 
 
