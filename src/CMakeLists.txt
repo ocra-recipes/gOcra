@@ -12,23 +12,23 @@ include_directories(
 file(
 	GLOB_RECURSE
 	source_files
-	
+
 	*.cpp
 )
 
 
 LINK_DIRECTORIES(
-    ${PC_ORCA_FRAMEWORK_LIBRARY_DIRS}
+    ${PC_OCRA_FRAMEWORK_LIBRARY_DIRS}
     ${PC_QUADPROG_LIBRARY_DIRS}
 )
 
 
 add_library(
 	${PROJECTNAME} ${suffix_type}
-	${LIB_TYPE}
 	${source_files}
 )
 
+MESSAGE(STATUS "ocra libs:	" ${PC_OCRA_FRAMEWORK_LIBRARY_DIRS})
 
 target_link_libraries(
     ${PROJECTNAME}
@@ -39,7 +39,5 @@ target_link_libraries(
 
 
 install(
-    TARGETS ${PROJECTNAME}
-    ${install_type} DESTINATION lib
+    TARGETS ${PROJECTNAME} DESTINATION lib
 )
-
