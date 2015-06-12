@@ -11,8 +11,8 @@ namespace gocra
  * \param _stiffness            Stiffness constant for task
  * \param _damping              Damping constant for task
  */
-gOcraCoMTaskManager::gOcraCoMTaskManager(GHCJTController& _ctrl, const gOcraModel& _model, const std::string& _taskName, double _stiffness, double _damping)
-    : gOcraTaskManagerBase(_ctrl, _model, _taskName)
+gOcraCoMTaskManager::gOcraCoMTaskManager(GHCJTController& _ctrl, const gOcraModel& _model, const std::string& _taskName, ocra::ECartesianDof _axes, double _stiffness, double _damping)
+    : gOcraTaskManagerBase(_ctrl, _model, _taskName), axes(_axes)
 {
     _init(_stiffness, _damping);
 }
@@ -26,8 +26,8 @@ gOcraCoMTaskManager::gOcraCoMTaskManager(GHCJTController& _ctrl, const gOcraMode
  * \param _damping              Damping constant for task
  * \param _posDes               Vector for desired position
  */
-gOcraCoMTaskManager::gOcraCoMTaskManager(GHCJTController& _ctrl, const gOcraModel& _model, const std::string& _taskName, double _stiffness, double _damping, Eigen::Vector3d _posDes)
-    : gOcraTaskManagerBase(_ctrl, _model, _taskName)
+gOcraCoMTaskManager::gOcraCoMTaskManager(GHCJTController& _ctrl, const gOcraModel& _model, const std::string& _taskName, ocra::ECartesianDof _axes, double _stiffness, double _damping, Eigen::Vector3d _posDes)
+    : gOcraTaskManagerBase(_ctrl, _model, _taskName), axes(_axes)
 {
     _init(_stiffness, _damping);
     setState(_posDes);
@@ -45,8 +45,8 @@ gOcraCoMTaskManager::gOcraCoMTaskManager(GHCJTController& _ctrl, const gOcraMode
  * \param accDes                Vector for desired acceleration
  */
 /*
-gOcraCoMTaskManager::gOcraCoMTaskManager(GHCJTController& ctrl, const Model& model, const std::string& taskName, double stiffness, double damping, double weight, Eigen::Vector3d posDes, Eigen::Vector3d velDes, Eigen::Vector3d accDes)
-    : _ctrl(ctrl), _model(model), _name(taskName)
+gOcraCoMTaskManager::gOcraCoMTaskManager(GHCJTController& ctrl, const Model& model, const std::string& taskName, ocra::ECartesianDof axes, double stiffness, double damping, double weight, Eigen::Vector3d posDes, Eigen::Vector3d velDes, Eigen::Vector3d accDes)
+    : _ctrl(ctrl), _model(model), _name(taskName), axes(_axes)
 {
     _init(stiffness, damping, weight);
 }
@@ -59,8 +59,8 @@ void gOcraCoMTaskManager::_init(double stiffness, double damping)
 {
     featFrame = new ocra::CoMFrame(name + ".CoMFrame", model);
     featDesFrame = new ocra::TargetFrame(name + ".TargetFrame", model);
-    feat = new ocra::PositionFeature(name + ".PositionFeature", *featFrame, ocra::XYZ);
-    featDes = new ocra::PositionFeature(name + ".PositionFeature_Des", *featDesFrame, ocra::XYZ);
+    feat = new ocra::PositionFeature(name + ".PositionFeature", *featFrame, axes);
+    featDes = new ocra::PositionFeature(name + ".PositionFeature_Des", *featDesFrame, axes);
     task = &(ctrl.createGHCJTTask(name, *feat, *featDes));
     ctrl.addTask(*task);
     task->setStiffness(stiffness);
