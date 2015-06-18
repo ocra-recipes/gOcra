@@ -71,7 +71,7 @@ struct GHCJTTask::Pimpl
         , solver(0x0)
         , useGSHC(false)
         , fcVar(name+".var", s.getDimension())
-        , taskSEConstraintFunction(buildSEFunction(fcVar, m, s))
+        , taskSEConstraintFunction()
         , frictionConstraint(NULL)
         , frictionFunction()
         , weight(1.)
@@ -100,17 +100,13 @@ struct GHCJTTask::Pimpl
             const int inDim = 3;
             frictionConstraint.set( new LinearFunction(fcVar, MatrixXd::Identity(outDim, inDim), VectorXd::Zero(outDim)) );
         }
-//        if (isFreeFloating)
-//        {
-//            taskSEConstraintFunction.reset(new LinearFunction( fcVar, MatrixXd::Zero(m.nbDofs() - m.nbInternalDofs(), fcVar.getSize()), VectorXd::Zero(m.nbDofs() - m.nbInternalDofs()) ));
-//        }
-    }
-
-    static LinearFunction* buildSEFunction(Variable& var, const Model& m, const Feature& s)
-    {
-        return new LinearFunction( var, MatrixXd::Zero(m.nbDofs() - m.nbInternalDofs(), var.getSize()), VectorXd::Zero(m.nbDofs() - m.nbInternalDofs()) );
+        if (isFreeFloating)
+        {
+            taskSEConstraintFunction.reset(new LinearFunction( fcVar, MatrixXd::Zero(m.nbDofs() - m.nbInternalDofs(), fcVar.getSize()), VectorXd::Zero(m.nbDofs() - m.nbInternalDofs()) ));
+        }
 
     }
+
 
 
     ~Pimpl()
